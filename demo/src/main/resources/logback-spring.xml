@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds"> <!-- 30초 마다 파일이 변경되면 다시 로딩 -->
+
+  	<property name="LOGS" value="./logs" />
+ 
+    <appender name="console"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+
+    <!-- console로 log 남기기 -->
+   <!--  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender> -->
+    <!-- file로 log 남기기 -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/api.log</file>
+         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 파일이 하루에 한개씩 생성된다 -->
+            <fileNamePattern>${LOGS}/api.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- maxHIstory 설정은 위 부분에 롤링 정책에 따라 적용되 된다고 보면된다.
+             위 설정데로 라면 30일이 지난 파일은 삭제가 된다.-->
+            <!--<maxHistory>30</maxHistory>-->
+        </rollingPolicy>
+    </appender>
+
+    <!-- 패키지 아래에 있는 로그는 전부 찍는다. -->
+    <springProfile name="dev">
+        <root level="debug">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </root>
+        <logger name="com.example.demo" level="debug"/>
+        <logger name="org.springframework" level="info" />
+    </springProfile>
+    <springProfile name="stag">
+        <root level="debug">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </root>
+        <logger name="com.example.demo" level="debug"/>
+        <logger name="org.springframework" level="info" />
+    </springProfile>
+    <springProfile name="prod">
+        <root level="info">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </root>
+        <logger name="com.example.demo" level="info"/>
+        <logger name="org.springframework" level="info" />
+    </springProfile>
+</configuration>
